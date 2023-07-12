@@ -4,7 +4,7 @@ logger.level = "debug";
 const express = require("express");
 const WSServer = require('websocket').server;
 const fs = require("fs");
-const lib = require("libs/server.js");
+const lib = require("./libs/server.js");
 const session = require("express-session");
 const devices = [];
 

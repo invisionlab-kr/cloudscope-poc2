@@ -134,11 +134,11 @@ async function loop() {
   });
   socket.on("message", function(msg) {
     socket.$buf = Buffer.concat([socket.$buf, msg]);
-    if(socket.$buf.length<2) return;
-    let length = socket.$buf.readUInt16BE(0);
+    if(socket.$buf.length<4) return;
+    let length = socket.$buf.readUInt32BE(0);
     if(socket.$buf.length >= length) {
-      let type = socket.$buf.readUInt8(2);
-      let body = socket.$buf.subarray(3, length);
+      let type = socket.$buf.readUInt8(4);
+      let body = socket.$buf.subarray(5, length);
       if(type==lib.const.TYPE_LED_LOW) {
         const led = new Gpio(18, 'out');
         // ...
@@ -157,16 +157,16 @@ async function loop() {
     logger.info("connected.");
     // greeting
     let cbuf = Buffer.from(JSON.stringify(config));
-    let rbuf = Buffer.alloc(3);
-    rbuf.writeUInt16BE(3+cbuf.length, 0);
-    rbuf.writeUInt8(lib.const.TYPE_GREETING, 2);
+    let rbuf = Buffer.alloc(5);
+    rbuf.writeUInt32BE(5+cbuf.length, 0);
+    rbuf.writeUInt8(lib.const.TYPE_GREETING, 4);
     socket.send(rbuf);
     socket.send(cbuf);
     // heartbeat
     timer = setInterval(function() {
-      let buf = Buffer.alloc(3);
-      buf.writeUInt16BE(3, 0);
-      buf.writeUInt8(lib.const.TYPE_PING, 2);
+      let buf = Buffer.alloc(5);
+      buf.writeUInt32BE(5, 0);
+      buf.writeUInt8(lib.const.TYPE_PING, 4);
       socket.send(buf);
     }, 3000);
     // 스틸샷 생성 모니터링
@@ -177,9 +177,9 @@ async function loop() {
         // 새로운 파일이 생성되었을 때, 와이파이에 연결된 상태이고 heartbeat에 성공한 상태라면, 서버로 전송한다.
         processing = true;
         let img = fs.readFileSync(`./stills/${filename}`);
-        let header = Buffer.alloc(3);
-        header.writeUInt16BE(img.length+3, 0);
-        header.writeUInt8(lib.const.TYPE_IMAGE, 2);
+        let header = Buffer.alloc(5);
+        header.writeUInt32BE(img.length+5, 0);
+        header.writeUInt8(lib.const.TYPE_IMAGE, 4);
         socket.write(header);
         socket.write(img);
         processing = false;

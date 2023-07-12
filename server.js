@@ -52,8 +52,8 @@ server.ws("/sock", function(conn,req) {
   conn.on("message", function(msg) {
     conn.$buf = Buffer.concat([conn.$buf, msg]);
     let length, type;
-    if(conn.$buf.length>=2) length = conn.$buf.readUInt16BE(0);
-    if(conn.$buf.length>=3) type = conn.$buf.readUInt8(2);
+    if(conn.$buf.length>=4) length = conn.$buf.readUInt32BE(0);
+    if(conn.$buf.length>=5) type = conn.$buf.readUInt8(4);
     if(type==lib.const.TYPE_GREETING && conn.$buf.length>=length) {
       // 클라이언트 등록
       conn.config = JSON.parse(conn.$buf.subarray(3, length).toString());

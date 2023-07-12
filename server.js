@@ -2,7 +2,7 @@ const log4js = require("log4js");
 const logger = log4js.getLogger("server");
 logger.level = "debug";
 const express = require("express");
-const WSServer = require('websocket').server;
+const ws = require('ws');
 const fs = require("fs");
 const lib = require("./libs/server.js");
 const session = require("express-session");
@@ -48,22 +48,13 @@ server.listen(3000, function() {
   logger.info("server ready.");
 });
 
-let wss = new WSServer({
-  httpServer: server,
-  autoAcceptConnections: false
+let wss = new ws.Server({
+  server
 });
-wss.on("request", function(req) {
-  logger.debug("여긴 들어오나?");
-  if(!isAllowed(req)) {
-    req.reject();
-    logger.info((new Date()) + ' Connection from origin ' + req.origin + ' rejected.');
-    return;
-  }
-  let conn = req.accept();
+wss.on("connection", function(conn) {
   conn.$buf = Buffer.alloc(0);
   conn.on("message", function(msg) {
-    if(msg.type!="binary") return;
-    conn.$buf = Buffer.concat([conn.$buf, msg.binaryData]);
+    conn.$buf = Buffer.concat([conn.$buf, msg]);
     let length, type;
     if(conn.$buf.length>=2) length = conn.$buf.readUInt16BE(0);
     if(conn.$buf.length>=3) type = conn.$buf.readUInt8(2);

@@ -46,6 +46,7 @@ server.get("/download", function(req, res, next) {
   res.render("01_CloudScope_Download");
 });
 server.ws("/sock", function(conn,req) {
+  logger.info("client connected.");
   conn.$buf = Buffer.alloc(0);
   conn.$saving = false;
   conn.$active = (new Date()).getTime();
@@ -79,7 +80,7 @@ server.ws("/sock", function(conn,req) {
   conn.on("close", function(why, desc) {
     let idx = devices.indexOf(conn);
     if(idx!=-1) devices.splice(idx, 1);
-    logger.info(`${conn.remoteAddress} disconnected. (${why}: ${desc})`);
+    logger.info(`client disconnected. (${why}: ${desc})`);
   })
 });
 

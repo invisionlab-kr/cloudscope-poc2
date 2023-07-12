@@ -85,7 +85,7 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
       config
     });
   });
-  server.post("/proc/ssid", function(req, res, next) {
+  server.get("/proc/ssid", function(req, res, next) {
     Promise.race([
       new Promise((resolve, reject) => {
         cp.exec("bash -c 'sudo iw dev wlan1 scan | grep 'SSID:''", function(err,stdout,stderr) {

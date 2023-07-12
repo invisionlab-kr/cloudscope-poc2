@@ -53,6 +53,7 @@ let wss = new WSServer({
   autoAcceptConnections: false
 });
 wss.on("request", function(req) {
+  logger.debug("여긴 들어오나?");
   if(!isAllowed(req)) {
     req.reject();
     logger.info((new Date()) + ' Connection from origin ' + req.origin + ' rejected.');

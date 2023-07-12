@@ -45,7 +45,7 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
     disk.check("./stills")
     .then((info) => {
       if(info.available < 1024*1024*100)
-        cp.execSync("rm -rf ./stills/*.png");
+        cp.execSync("rm -rf ./stills/*.jpg");
     })
     .catch((e) => {});
   }, 5*60*1000);
@@ -172,7 +172,7 @@ async function loop() {
     // 스틸샷 생성 모니터링
     let processing = false;
     watcher = fs.watch("./stills", function(ev, filename) {
-      if(filename && filename.endsWith(".png") && !processing && socket && typeof socket == "object" && socket.readyState==1) {
+      if(filename && filename.endsWith(".jpg") && !processing && socket && typeof socket == "object" && socket.readyState==1) {
         // 새로운 파일이 생성되었을 때, 와이파이에 연결된 상태이고 heartbeat에 성공한 상태라면, 서버로 전송한다.
         processing = true;
         let img = fs.readFileSync(`./stills/${filename}`);

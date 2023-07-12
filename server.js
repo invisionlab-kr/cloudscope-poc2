@@ -48,7 +48,7 @@ server.listen(3000, function() {
   logger.info("server ready.");
 });
 
-let wss = new ws.Server({
+let wss = new ws.WebSocketServer({
   server
 });
 wss.on("connection", function(conn) {

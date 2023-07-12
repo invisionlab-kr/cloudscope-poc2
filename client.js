@@ -34,7 +34,7 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
   // ffmpeg 시작
   let ffmpegProcess = null;
   logger.info("starting ffmpeg...");
-  ffmpegProcess = cp.exec("ffmpeg -y -f video4linux2 -pix_fmt -video_size 1280x720 -i /dev/video0 -q:v 2 -f image2 ./stills/capture_%16d.png");
+  ffmpegProcess = cp.exec("ffmpeg -y -f video4linux2 -pix_fmt yuv420p -video_size 1280x720 -i /dev/video0 -q:v 2 -f image2 ./stills/capture_%16d.png");
   ffmpegProcess.on("close", function(code) {
     logger.error(`FFMPEG process closed with exit code ${code}`);
     ffmpegProcess = null;
@@ -124,12 +124,6 @@ async function loop() {
   // 백엔드 서버에 연결 시도
   logger.info("Trying to connect server...");
   let socket = new ws.WebSocket('wss://cloudscope.invisionlab.xyz');
-  socket.on("error", function() {
-    if(watcher) watcher.close();
-    if(timer) clearInterval(timer);
-    setTimeout(loop, 1000);
-    return;
-  });
   socket.on("close", function() {
     if(watcher) watcher.close();
     if(timer) clearInterval(timer);

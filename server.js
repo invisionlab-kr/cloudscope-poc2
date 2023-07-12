@@ -2,13 +2,14 @@ const log4js = require("log4js");
 const logger = log4js.getLogger("server");
 logger.level = "debug";
 const express = require("express");
-const ws = require('ws');
+const enableWs = require('express-ws');
 const fs = require("fs");
 const lib = require("./libs/server.js");
 const session = require("express-session");
 const devices = [];
 
 let server = express();
+enableWs(server);
 server.set("view engine", "ejs");
 server.set("views", "./templates");
 server.set('trust proxy', 1) // trust first proxy
@@ -44,15 +45,7 @@ server.get("/live", function(req, res, next) {
 server.get("/download", function(req, res, next) {
   res.render("01_CloudScope_Download");
 });
-server.listen(3000, function() {
-  logger.info("server ready.");
-});
-
-let wss = new ws.WebSocketServer({
-  server,
-  path: "/sock"
-});
-wss.on("connection", function(conn) {
+server.ws("/sock", function(conn,req) {
   conn.$buf = Buffer.alloc(0);
   conn.$saving = false;
   conn.$active = (new Date()).getTime();
@@ -88,4 +81,11 @@ wss.on("connection", function(conn) {
     if(idx!=-1) devices.splice(idx, 1);
     logger.info(`${conn.remoteAddress} disconnected. (${why}: ${desc})`);
   })
+});
+
+
+
+
+server.listen(3000, function() {
+  logger.info("server ready.");
 });

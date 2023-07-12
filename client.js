@@ -64,7 +64,7 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
     });
   });
   server.post("/stage1", async function(req, res, next) {
-    config.remoteSsid = req.query.ssid;
+    config.ssid = req.query.ssid;
     config.wifi_password = req.query.passwd;
     fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
     res.json({result:true});
@@ -75,7 +75,7 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
     });
   });
   server.post("/stage2", function(req, res, next) {
-    config.wifi_password = req.query.passwd;
+    config.password = req.query.passwd;
     fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
     setTimeout(()=>{cp.execSync(`bash -c "sudo reboot"`)}, 3000);
     res.json({result:true});

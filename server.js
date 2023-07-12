@@ -72,6 +72,7 @@ server.ws("/sock", function(conn,req) {
       // 이 클라이언트에서 수신된 이미지 저장
       conn._saving = true;
       fs.writeFileSync(`./storage/S${conn.config.deviceName}/latest.png`, conn.$buf.subarray(5, length));
+      logger.info(`saved image ${length-5} bytes`);
       conn.$saving = false;
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);

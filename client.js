@@ -179,8 +179,8 @@ async function loop() {
         let header = Buffer.alloc(5);
         header.writeUInt32BE(img.length+5, 0);
         header.writeUInt8(lib.const.TYPE_IMAGE, 4);
-        socket.write(header);
-        socket.write(img);
+        socket.send(header);
+        socket.send(img);
         processing = false;
       }
     });

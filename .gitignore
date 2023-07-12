@@ -1,3 +1,9 @@
+.DS_Store
+wpa_supplicant.conf
+*test*
+stills/*.png
+storage/S*
+
 # Logs
 logs
 *.log

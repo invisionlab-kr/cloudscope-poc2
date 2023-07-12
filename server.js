@@ -88,11 +88,3 @@ wss.on("connection", function(conn) {
     logger.info(`${conn.remoteAddress} disconnected. (${why}: ${desc})`);
   })
 });
-
-
-
-
-function isAllowed(req) {
-  // ...
-  return true;
-}

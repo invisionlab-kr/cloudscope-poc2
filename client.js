@@ -124,6 +124,7 @@ async function loop() {
   // 백엔드 서버에 연결 시도
   logger.info("Trying to connect server...");
   let socket = new ws.WebSocket('wss://cloudscope.invisionlab.xyz');
+  socket.on("error", function() {});
   socket.on("close", function() {
     if(watcher) watcher.close();
     if(timer) clearInterval(timer);

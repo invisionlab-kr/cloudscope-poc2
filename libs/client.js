@@ -27,16 +27,16 @@ module.exports = {
 
 
   connectWifiWithPassword: function(ssid, passwd, logger) {
-    try { cp.execSync("bash -c 'sudo wpa_cli disconnect -i wlan1 >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect secured WIFI: stage 1`); }
-    try { cp.execSync("bash -c 'sudo killall -9 wpa_supplicant >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect secured WIFI: stage 2`); }
-    try { cp.execSync("bash -c 'sudo ip link set wlan1 up >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect secured WIFI: stage 3`); }
+    try { cp.execSync("bash -c 'sudo wpa_cli disconnect -i wlan1 >/dev/null 2>/dev/null'"); } catch(e) { }
+    try { cp.execSync("bash -c 'sudo killall -9 wpa_supplicant >/dev/null 2>/dev/null'"); } catch(e) { }
+    try { cp.execSync("bash -c 'sudo ip link set wlan1 up >/dev/null 2>/dev/null'"); } catch(e) { }
     try {
       cp.execSync(`bash -c 'sudo wpa_passphrase "${ssid}" > ./wpa_supplicant.conf'`, {
         input: Buffer.from(passwd+"\n")
       });
     } catch(e) { logger.error(`Error while connect secured WIFI: stage 4`); }
-    try { cp.execSync("bash -c 'sudo wpa_supplicant -B -i wlan1 -c ./wpa_supplicant.conf >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect secured WIFI: stage 5`); }
-    try { cp.execSync("bash -c 'sudo dhclient wlan1 >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect secured WIFI: stage 6`); }
+    try { cp.execSync("bash -c 'sudo wpa_supplicant -B -i wlan1 -c ./wpa_supplicant.conf >/dev/null 2>/dev/null'"); } catch(e) { }
+    try { cp.execSync("bash -c 'sudo dhclient wlan1 >/dev/null 2>/dev/null'"); } catch(e) { }
     if(!this._reroute) this._reroute = setInterval(function() {
       try { cp.execSync("bash -c 'sudo ip route del default dev wlan0 >/dev/null 2>/dev/null'"); } catch(e) {}
     }, 1000);
@@ -46,13 +46,13 @@ module.exports = {
 
 
   connectWifiWithoutPassword: function(ssid, logger) {
-    try { cp.execSync("bash -c 'sudo wpa_cli disconnect -i wlan1 >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect WIFI: stage 1`); }
-    try { cp.execSync("bash -c 'killall -9 wpa_supplicant >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect WIFI: stage 2`); }
-    try { cp.execSync("bash -c 'sudo ip link set wlan1 up >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect WIFI: stage 3`); }
-    try { cp.execSync(`bash -c 'sudo iw dev wlan1 connect ${ssid} >/dev/null 2>/dev/null'`); } catch(e) { logger.error(`Error while connect WIFI: stage 4`); }
-    try { cp.execSync("bash -c 'sudo dhclient wlan1 >/dev/null 2>/dev/null'"); } catch(e) { logger.error(`Error while connect WIFI: stage 5`); }
+    try { cp.execSync("bash -c 'sudo wpa_cli disconnect -i wlan1 >/dev/null 2>/dev/null'"); } catch(e) { }
+    try { cp.execSync("bash -c 'killall -9 wpa_supplicant >/dev/null 2>/dev/null'"); } catch(e) { }
+    try { cp.execSync("bash -c 'sudo ip link set wlan1 up >/dev/null 2>/dev/null'"); } catch(e) { }
+    try { cp.execSync(`bash -c 'sudo iw dev wlan1 connect ${ssid} >/dev/null 2>/dev/null'`); } catch(e) { }
+    try { cp.execSync("bash -c 'sudo dhclient wlan1 >/dev/null 2>/dev/null'"); } catch(e) { }
     if(!this._reroute) this._reroute = setInterval(function() {
-      try { cp.execSync("bash -c 'sudo ip route del default dev wlan0 >/dev/null 2>/dev/null'"); } catch(e) {}
+      try { cp.execSync("bash -c 'sudo ip route del default dev wlan0 >/dev/null 2>/dev/null'"); } catch(e) { }
     }, 1000);
   },
 

@@ -34,7 +34,7 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
   // ffmpeg 시작
   let ffmpegProcess = null;
   logger.info("starting ffmpeg...");
-  ffmpegProcess = cp.exec("ffmpeg -y -f video4linux2 -pix_fmt yuv420p -video_size 1280x720 -i /dev/video0 -q:v 2 -f image2 ./stills/capture_%16d.png");
+  ffmpegProcess = cp.exec("ffmpeg -y -f video4linux2 -pix_fmt yuv420p -video_size 1280x720 -i /dev/video0 -r 1 -f image2 ./stills/capture_%16d.jpg");
   ffmpegProcess.on("close", function(code) {
     logger.error(`FFMPEG process closed with exit code ${code}`);
     ffmpegProcess = null;

@@ -22,7 +22,7 @@ server.use(express.static("./statics"));
 server.use(express.urlencoded({extended:true}));
 server.use(express.json());
 server.get("/", function(req, res, next) {
-  res.render("01_CloudScope_Login", req.query);
+  res.render("01_CloudScope_Login", {err:"", ...req.query});
 });
 server.post("/login", function(req, res, next) {
   let list = devices.filter((d) => (d.config.deviceName==req.body.deviceName&&d.config.password==req.body.passwd));
@@ -31,7 +31,7 @@ server.post("/login", function(req, res, next) {
     req.session.interval = list[0].config.interval;
     res.redirect("/live");
   } else {
-    res.redirect("/?r=ERR_LOGIN");
+    res.redirect("/?err=ERR_LOGIN");
   }
 });
 server.get("/logout", function(req, res, next) {

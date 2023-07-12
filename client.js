@@ -8,7 +8,7 @@ logger.level = "debug";
 const express = require("express");
 const Gpio = require('onoff').Gpio;
 const cp = require("child_process");
-const ws = require("ws");
+const WebSocket = require("ws");
 let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""};
 
 (async function main() {
@@ -123,7 +123,7 @@ async function loop() {
   let watcher = null, timer = null;
   // 백엔드 서버에 연결 시도
   logger.info("Trying to connect server...");
-  let socket = new ws.WebSocket('wss://cloudscope.invisionlab.xyz');
+  let socket = new WebSocket('wss://cloudscope.invisionlab.xyz');
   socket.on("error", function() {});
   socket.on("close", function() {
     if(watcher) watcher.close();

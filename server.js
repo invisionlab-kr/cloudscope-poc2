@@ -49,10 +49,13 @@ server.listen(3000, function() {
 });
 
 let wss = new ws.WebSocketServer({
-  server
+  server,
+  path: "/sock"
 });
 wss.on("connection", function(conn) {
   conn.$buf = Buffer.alloc(0);
+  conn.$saving = false;
+  conn.$active = (new Date()).getTime();
   conn.on("message", function(msg) {
     conn.$buf = Buffer.concat([conn.$buf, msg]);
     let length, type;
@@ -64,8 +67,6 @@ wss.on("connection", function(conn) {
       devices.push(conn);
       // 이미지 저장할 디렉토리 준비
       if(!fs.existsSync(`./storage/S${conn.config.deviceName}`)) fs.mkdirSync(`./storage/S${conn.config.deviceName}`);
-      conn.$saving = false;
-      conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
     }
     if(type==lib.const.TYPE_PING && conn.config) {

@@ -56,7 +56,7 @@ server.ws("/sock", function(conn,req) {
     if(conn.$buf.length>=3) type = conn.$buf.readUInt8(2);
     if(type==lib.const.TYPE_GREETING && conn.$buf.length>=length) {
       // 클라이언트 등록
-      conn.config = JSON.parse(conn.$buf.subarray(3, length-3).toString());
+      conn.config = JSON.parse(conn.$buf.subarray(3, length).toString());
       devices.push(conn);
       // 이미지 저장할 디렉토리 준비
       if(!fs.existsSync(`./storage/S${conn.config.deviceName}`)) fs.mkdirSync(`./storage/S${conn.config.deviceName}`);
@@ -70,7 +70,7 @@ server.ws("/sock", function(conn,req) {
     if(type==lib.const.TYPE_IMAGE && conn.config) {
       // 이 클라이언트에서 수신된 이미지 저장
       conn._saving = true;
-      fs.writeFileSync(`./storage/S${conn.config.deviceName}/latest.png`, conn.$buf.subarray(3, length-3));
+      fs.writeFileSync(`./storage/S${conn.config.deviceName}/latest.png`, conn.$buf.subarray(3, length));
       conn.$saving = false;
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);

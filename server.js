@@ -57,6 +57,7 @@ server.post("/set/led", function(req, res, next) {
   buf.writeUInt32BE(5, 0);
   buf.writeUInt8(req.body.status=="true"?lib.const.TYPE_LED_HIGH:lib.const.TYPE_LED_LOW, 4);
   d.send(buf);
+  res.send("OK");
 });
 server.get("/download", function(req, res, next) {
   if(!req.session.device) { res.redirect("/"); return; }

@@ -141,19 +141,22 @@ async function loop() {
       let body = socket.$buf.subarray(5, length);
       if(type==lib.const.TYPE_LED_LOW) {
         logger.debug("LED_LOW RECVED!");
+        config.led = "LOW";
+        fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
         const led = new Gpio(18, 'out');
         // ...
         led.unexport();
       }
       if(type==lib.const.TYPE_LED_HIGH) {
         logger.debug("LED_HIGH RECVED!");
+        config.led = "HIGH";
+        fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
         const led = new Gpio(18, 'out');
         // ...
         led.unexport();
       }
       if(type==lib.const.TYPE_GREETING) {
         config = JSON.parse(body.toString());
-        logger.debug("GREETING RECVED", config);
         fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
       }
       socket.$buf = socket.$buf.subarray(length);

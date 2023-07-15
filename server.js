@@ -78,7 +78,7 @@ server.ws("/sock", function(conn,req) {
       conn.$buf = conn.$buf.subarray(length);
     }
     else {
-      logger.error("recv wrong type", type, length);
+      logger.error("recv wrong type", type, length, conn.$buf.length);
     }
   });
   conn.on("close", function(why, desc) {

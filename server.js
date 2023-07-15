@@ -66,6 +66,7 @@ server.ws("/sock", function(conn,req) {
     }
     else if(type==lib.const.TYPE_PING && conn.config) {
       // 이 클라이언트의 최근 활동시각 업데이트
+      logger.info("pong!");
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
     }

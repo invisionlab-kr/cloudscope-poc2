@@ -45,6 +45,10 @@ server.get("/live", function(req, res, next) {
     config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
   });
 });
+server.get("/latest", function(req, res, next) {
+  if(!req.session.device) { res.status(500); return; }
+  res.sendFile(`./storage/S${req.session.device}/latest.jpg`);
+});
 server.get("/download", function(req, res, next) {
   res.render("01_CloudScope_Download");
 });

@@ -170,14 +170,12 @@ async function loop() {
       socket.send(buf);
     }, 3000);
     // 스틸샷 생성 모니터링
-    let processing = false;
     let lastNo = 0;
     watcher = fs.watch("./stills", function(ev, filename) {
       if(ev!="change") return;
-      logger.info(`image generated (${ev}), filename=${filename}, processing=${processing}, lastNo=${lastNo}`);
-      if(filename && filename.endsWith(".jpg") && !processing && socket && typeof socket == "object" && socket.readyState==1 && parseInt(filename.replace("capture_","").replace("\.jpg",""))>lastNo) {
+      logger.info(`image generated (${ev}), filename=${filename}, lastNo=${lastNo}`);
+      if(filename && filename.endsWith(".jpg") && socket && typeof socket == "object" && socket.readyState==1 && parseInt(filename.replace("capture_","").replace("\.jpg",""))>lastNo) {
         // 새로운 파일이 생성되었을 때, 와이파이에 연결된 상태이고 heartbeat에 성공한 상태라면, 서버로 전송한다.
-        processing = true;
         Promise.race([
           new Promise((resolve,_) => {
             fs.readFile(`./stills/${filename}`, (err, buf) => {
@@ -191,7 +189,6 @@ async function loop() {
           ,
           new Promise((resolve,_) => {
             setTimeout(() => {
-              logger.debug("TIMED OUT");
               resolve(null)
             }, 1000);
           })
@@ -206,12 +203,12 @@ async function loop() {
             socket.send(header);
             socket.send(result);
             logger.info(`sent image ${filename}, size=${result.length}`);
+          } else {
+            logger.debug("TIMED OUT");
           }
-          processing = false;
         })
         .catch((err) => {
           logger.error("Error while read file", err);
-          processing = false;
         })
       }
     });

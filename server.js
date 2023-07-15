@@ -47,7 +47,7 @@ server.get("/live", function(req, res, next) {
 });
 server.get("/latest", function(req, res, next) {
   if(!req.session.device) { res.status(500); return; }
-  res.sendFile(`./storage/S${req.session.device}/latest.jpg`);
+  res.sendFile(`${__dirname}/storage/S${req.session.device}/latest.jpg`);
 });
 server.get("/download", function(req, res, next) {
   res.render("01_CloudScope_Download");

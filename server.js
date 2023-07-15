@@ -41,17 +41,17 @@ server.get("/logout", function(req, res, next) {
   res.redirect("/");
 });
 server.get("/live", function(req, res, next) {
-  if(!req.session.device) { res.redirect("/"); return; }
+  if(!req.session || !req.session.device) { res.redirect("/"); return; }
   res.render("01_CloudScope_Live_Viewer", {
     config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
   });
 });
 server.get("/latest", function(req, res, next) {
-  if(!req.session.device) { res.status(500); return; }
+  if(!req.session || !req.session.device) { res.status(500); return; }
   res.sendFile(`${__dirname}/storage/S${req.session.device}/latest.jpg`);
 });
 server.post("/set/led", function(req, res, next) {
-  if(!req.session.device) { res.status(500); return; }
+  if(!req.session || !req.session.device) { res.status(500); return; }
   let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
   let buf = Buffer.alloc(5);
   buf.writeUInt32BE(5, 0);
@@ -60,13 +60,13 @@ server.post("/set/led", function(req, res, next) {
   res.send("OK");
 });
 server.get("/download", function(req, res, next) {
-  if(!req.session.device) { res.redirect("/"); return; }
+  if(!req.session || !req.session.device) { res.redirect("/"); return; }
   res.render("01_CloudScope_Download", {
     config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
   });
 });
 server.post("/set/interval", function(req, res, next) {
-  if(!req.session.device) { res.redirect("/"); return; }
+  if(!req.session || !req.session.device) { res.redirect("/"); return; }
   let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
   d.config.interval = req.body.interval;
   let cbuf = Buffer.from(JSON.stringify(d.config));
@@ -78,7 +78,7 @@ server.post("/set/interval", function(req, res, next) {
   res.send("OK");
 });
 server.post("/set/saved", function(req, res, next) {
-  if(!req.session.device) { res.redirect("/"); return; }
+  if(!req.session || !req.session.device) { res.redirect("/"); return; }
   let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
   let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   let count = 0;
@@ -91,7 +91,7 @@ server.post("/set/saved", function(req, res, next) {
   res.send(count.toString());
 });
 server.post("/set/delete", function(req, res, next) {
-  if(!req.session.device) { res.redirect("/"); return; }
+  if(!req.session || !req.session.device) { res.redirect("/"); return; }
   let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
   let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   while( true ) {
@@ -103,7 +103,7 @@ server.post("/set/delete", function(req, res, next) {
   res.send("OK");
 });
 server.get("/set/zip", function(req, res, next) {
-  if(!req.session.device) { res.redirect("/"); return; }
+  if(!req.session || !req.session.device) { res.redirect("/"); return; }
   let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
   let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   let zip = new admZip();

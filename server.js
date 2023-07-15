@@ -75,7 +75,7 @@ server.ws("/sock", function(conn,req) {
       conn.$saving = false;
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
-      logger.info(`saved image ${length-5} bytes, bufsize=${conn.$buf.length}`);
+      logger.info(`saved image ${length-5} bytes, bufsize=${conn.$buf.length} from ${conn.config.deviceName} (passwd ${conn.config.password})`);
     }
   });
   conn.on("close", function(why, desc) {

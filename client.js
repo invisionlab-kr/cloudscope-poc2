@@ -174,12 +174,12 @@ async function loop() {
     let lastNo = 0;
     watcher = fs.watch("./stills", function(ev, filename) {
       if(filename && filename.endsWith(".jpg") && !processing && socket && typeof socket == "object" && socket.readyState==1 && parseInt(filename.replace("capture_","").replace("\.jpg",""))>lastNo) {
-        logger.info("image generated", ev, filename);
-        lastNo = parseInt(filename.replace("capture_","").replace("\.jpg",""));
         // 새로운 파일이 생성되었을 때, 와이파이에 연결된 상태이고 heartbeat에 성공한 상태라면, 서버로 전송한다.
         processing = true;
         let img = fs.readFileSync(`./stills/${filename}`);
         if(img.length==0) return;
+        logger.info("image generated", ev, filename);
+        lastNo = parseInt(filename.replace("capture_","").replace("\.jpg",""));
         let header = Buffer.alloc(5);
         header.writeUInt32BE(img.length+5, 0);
         header.writeUInt8(lib.const.TYPE_IMAGE, 4);

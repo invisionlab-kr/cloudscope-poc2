@@ -13,7 +13,7 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
 
 (async function main() {
   // 이전 실행에서 생성된 이미지 모두 삭제
-  cp.execSync("rm -rf ./stills/*.png");
+  cp.execSync("rm -rf ./stills/*.jpg");
   logger.info( `Deleted old images` );
 
   // 카메라 장치 활성화 대기

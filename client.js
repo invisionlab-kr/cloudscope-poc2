@@ -180,12 +180,16 @@ async function loop() {
         processing = true;
         let img = fs.readFileSync(`./stills/${filename}`);
         if(img.length==0) return;
+        logger.debug(`${filename}, STEP 1`);
         lastNo = parseInt(filename.replace("capture_","").replace("\.jpg",""));
         let header = Buffer.alloc(5);
         header.writeUInt32BE(img.length+5, 0);
         header.writeUInt8(lib.const.TYPE_IMAGE, 4);
+        logger.debug(`${filename}, STEP 2`);
         socket.send(header);
+        logger.debug(`${filename}, STEP 3`);
         socket.send(img);
+        logger.debug(`${filename}, STEP 4`);
         processing = false;
         logger.info(`sent image ${filename}, size=${img.length}`);
       }

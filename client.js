@@ -192,15 +192,15 @@ async function loop() {
         ])
         .then((result) => {
           if(result) {
-            if(img.length==0) return;
+            if(result.length==0) return;
             lastNo = parseInt(filename.replace("capture_","").replace("\.jpg",""));
             let header = Buffer.alloc(5);
-            header.writeUInt32BE(img.length+5, 0);
+            header.writeUInt32BE(result.length+5, 0);
             header.writeUInt8(lib.const.TYPE_IMAGE, 4);
             socket.send(header);
-            socket.send(img);
+            socket.send(result);
             processing = false;
-            logger.info(`sent image ${filename}, size=${img.length}`);
+            logger.info(`sent image ${filename}, size=${result.length}`);
           }
         })
         .catch((err) => {

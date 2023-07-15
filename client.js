@@ -199,12 +199,13 @@ async function loop() {
             header.writeUInt8(lib.const.TYPE_IMAGE, 4);
             socket.send(header);
             socket.send(result);
-            processing = false;
             logger.info(`sent image ${filename}, size=${result.length}`);
           }
+          processing = false;
         })
         .catch((err) => {
           logger.error("Error while read file", err);
+          processing = false;
         })
       }
     });

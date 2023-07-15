@@ -40,7 +40,10 @@ server.get("/logout", function(req, res, next) {
   res.redirect("/");
 });
 server.get("/live", function(req, res, next) {
-  res.render("01_CloudScope_Live_Viewer");
+  if(!req.session.device) { res.redirect("/"); return; }
+  res.render("01_CloudScope_Live_Viewer", {
+    config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
+  });
 });
 server.get("/download", function(req, res, next) {
   res.render("01_CloudScope_Download");

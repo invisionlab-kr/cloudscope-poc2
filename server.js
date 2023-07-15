@@ -61,6 +61,7 @@ server.ws("/sock", function(conn,req) {
       devices.push(conn);
       // 이미지 저장할 디렉토리 준비
       if(!fs.existsSync(`./storage/S${conn.config.deviceName}`)) fs.mkdirSync(`./storage/S${conn.config.deviceName}`);
+      logger.info("greeting done")
       conn.$buf = conn.$buf.subarray(length);
     }
     else if(type==lib.const.TYPE_PING && conn.config) {

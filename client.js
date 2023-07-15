@@ -11,6 +11,13 @@ const cp = require("child_process");
 const ws = require("ws");
 let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""};
 
+let ledHigh = new Gpio(18, 'high');
+let ledLow = new Gpio(18, 'low');
+process.on('SIGINT', _ => {
+  ledHigh.unexport();
+  ledLow.unexport();
+});
+
 (async function main() {
   // 이전 실행에서 생성된 이미지 모두 삭제
   cp.execSync("rm -rf ./stills/*.jpg");
@@ -29,14 +36,8 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
   }
   
   // led 컨트롤 준비
-  let ledHigh = new Gpio(18, 'high');
-  let ledLow = new Gpio(18, 'low');
   if(config.led && config.led=="HIGH") ledHigh.write(1);
   else ledLow.write(0);
-  process.on('SIGINT', _ => {
-    ledHigh.unexport();
-    ledLow.unexport();
-  });
 
   // 백엔드에 ws 연결
   loop();

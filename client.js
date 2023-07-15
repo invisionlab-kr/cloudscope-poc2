@@ -178,21 +178,34 @@ async function loop() {
       if(filename && filename.endsWith(".jpg") && !processing && socket && typeof socket == "object" && socket.readyState==1 && parseInt(filename.replace("capture_","").replace("\.jpg",""))>lastNo) {
         // 새로운 파일이 생성되었을 때, 와이파이에 연결된 상태이고 heartbeat에 성공한 상태라면, 서버로 전송한다.
         processing = true;
-        logger.debug(`${filename}, STEP 0`);
-        let img = fs.readFileSync(`./stills/${filename}`);
-        if(img.length==0) return;
-        logger.debug(`${filename}, STEP 1`);
-        lastNo = parseInt(filename.replace("capture_","").replace("\.jpg",""));
-        let header = Buffer.alloc(5);
-        header.writeUInt32BE(img.length+5, 0);
-        header.writeUInt8(lib.const.TYPE_IMAGE, 4);
-        logger.debug(`${filename}, STEP 2`);
-        socket.send(header);
-        logger.debug(`${filename}, STEP 3`);
-        socket.send(img);
-        logger.debug(`${filename}, STEP 4`);
-        processing = false;
-        logger.info(`sent image ${filename}, size=${img.length}`);
+        Promise.race([
+          new Promise((resolve,_) => {
+            fs.readFile(`./stills/${filename}`, (err, buf) => {
+              if(err) _(err);
+              else resolve(buf);
+            });
+          })
+          ,
+          new Promise((resolve,_) => {
+            setTimeout(() => {resolve(null)}, 1000);
+          })
+        ])
+        .then((result) => {
+          if(result) {
+            if(img.length==0) return;
+            lastNo = parseInt(filename.replace("capture_","").replace("\.jpg",""));
+            let header = Buffer.alloc(5);
+            header.writeUInt32BE(img.length+5, 0);
+            header.writeUInt8(lib.const.TYPE_IMAGE, 4);
+            socket.send(header);
+            socket.send(img);
+            processing = false;
+            logger.info(`sent image ${filename}, size=${img.length}`);
+          }
+        })
+        .catch((err) => {
+          logger.error("Error while read file", err);
+        })
       }
     });
   });

@@ -142,7 +142,7 @@ server.ws("/sock", function(conn,req) {
       conn.$saving = false;
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
-      if(conn.config.interval && parseInt(conn.config.interval)>0 && (new Date()).getTime()<conn.$last+(conn.config.interval*1000*60)) {
+      if(conn.config.interval && parseInt(conn.config.interval)>0 && (new Date()).getTime()>conn.$last+(conn.config.interval*1000*60)) {
         let now = new Date();
         conn.$last = now.getTime();
         let name = "SAVED "+conn.config.deviceName+" ("+now.getFullYear()+"-"+("0"+(parseInt(now.getMonth())+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2)+" "+("0"+now.getHours()).slice(-2)+":"+("0"+now.getMinutes()).slice(-2)+").jpg";

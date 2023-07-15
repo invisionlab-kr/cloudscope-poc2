@@ -51,9 +51,8 @@ server.ws("/sock", function(conn,req) {
   conn.$saving = false;
   conn.$active = (new Date()).getTime();
   conn.on("message", function(msg) {
-    logger.debug(`typeof msg = ${typeof msg}, length=${msg.length}`)
     conn.$buf = Buffer.concat([conn.$buf, msg]);
-    logger.debug(`bufsize=${conn.$buf.length}`);
+    logger.debug(`RECV typeof msg = ${typeof msg}, length=${msg.length}, bufsize=${conn.$buf.length}`)
     let length, type;
     if(conn.$buf.length>=4) length = conn.$buf.readUInt32BE(0); else return;
     if(conn.$buf.length>=5) type = conn.$buf.readUInt8(4); else return;

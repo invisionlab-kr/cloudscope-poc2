@@ -52,7 +52,6 @@ server.ws("/sock", function(conn,req) {
   conn.$active = (new Date()).getTime();
   conn.on("message", function(msg) {
     conn.$buf = Buffer.concat([conn.$buf, msg]);
-    logger.debug(`RECV typeof msg = ${typeof msg}, length=${msg.length}, bufsize=${conn.$buf.length}`)
     let length, type;
     if(conn.$buf.length>=4) length = conn.$buf.readUInt32BE(0); else return;
     if(conn.$buf.length>=5) type = conn.$buf.readUInt8(4); else return;
@@ -62,12 +61,10 @@ server.ws("/sock", function(conn,req) {
       devices.push(conn);
       // 이미지 저장할 디렉토리 준비
       if(!fs.existsSync(`./storage/S${conn.config.deviceName}`)) fs.mkdirSync(`./storage/S${conn.config.deviceName}`);
-      logger.info("greeting done")
       conn.$buf = conn.$buf.subarray(length);
     }
     else if(type==lib.const.TYPE_PING && conn.config) {
       // 이 클라이언트의 최근 활동시각 업데이트
-      logger.info("pong!");
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
     }
@@ -79,9 +76,6 @@ server.ws("/sock", function(conn,req) {
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
       logger.info(`saved image ${length-5} bytes, bufsize=${conn.$buf.length}`);
-    }
-    else {
-      logger.error(`recv wrong type ${type}, length=${length}, bufsize=${conn.$buf.length}`);
     }
   });
   conn.on("close", function(why, desc) {

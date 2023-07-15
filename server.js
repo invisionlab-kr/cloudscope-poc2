@@ -6,7 +6,7 @@ const enableWs = require('express-ws');
 const fs = require("fs");
 const lib = require("./libs/server.js");
 const session = require("express-session");
-const zip = require("adm-zip");
+const admZip = require("adm-zip");
 const devices = [];
 
 let server = express();
@@ -93,6 +93,23 @@ server.post("/set/delete", function(req, res, next) {
   dir.close();
   res.send("OK");
 });
+server.get("/set/zip", function(req, res, next) {
+  if(!req.session.device) { res.redirect("/"); return; }
+  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
+  let zip = new admZip();
+  while( true ) {
+    let dirent = dir.readSync();
+    if(dirent==null) break;
+    if(dirent.name.startsWith("SAVED")) {
+      zip.addLocalFile(`./storage/S${d.config.deviceName}/${dirent.name}`);
+      fs.unlinkSync(`./storage/S${d.config.deviceName}/${dirent.name}`);
+    }
+  }
+  dir.close();
+  res.set("Content-Type", "application/zip");
+  res.send(zip.toBuffer());
+});
 server.ws("/sock", function(conn,req) {
   logger.info(`client connected. (current total ${devices.length})`);
   conn.$buf = Buffer.alloc(0);
@@ -127,6 +144,7 @@ server.ws("/sock", function(conn,req) {
       conn.$buf = conn.$buf.subarray(length);
       if(conn.config.interval && parseInt(conn.config.interval)>0 && (new Date()).getTime()<conn.$last+(conn.config.interval*1000*60)) {
         let now = new Date();
+        conn.$last = now.getTime();
         let name = "SAVED "+conn.config.deviceName+" ("+now.getFullYear()+"-"+("0"+(parseInt(now.getMonth())+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2)+" "+("0"+now.getHours()).slice(-2)+":"+("0"+now.getMinutes()).slice(-2)+").jpg";
         fs.cpSync(
           `./storage/S${conn.config.deviceName}/latest.jpg`,

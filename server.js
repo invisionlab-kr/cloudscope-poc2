@@ -71,7 +71,7 @@ server.post("/set/interval", function(req, res, next) {
 server.post("/set/saved", function(req, res, next) {
   if(!req.session.device) { res.redirect("/"); return; }
   let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
-  let dir = fs.opendirSync(`./storage/S${d.deviceName}`);
+  let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   let count = 0;
   while( true ) {
     let dirent = dir.readSync();
@@ -84,11 +84,11 @@ server.post("/set/saved", function(req, res, next) {
 server.post("/set/delete", function(req, res, next) {
   if(!req.session.device) { res.redirect("/"); return; }
   let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
-  let dir = fs.opendirSync(`./storage/S${d.deviceName}`);
+  let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   while( true ) {
     let dirent = dir.readSync();
     if(dirent==null) break;
-    fs.unlinkSync(`./storage/S${d.deviceName}/${dirent.name}`);
+    fs.unlinkSync(`./storage/S${d.config.deviceName}/${dirent.name}`);
   }
   dir.close();
   res.send("OK");

@@ -27,6 +27,16 @@ let config = {ssid:"", wifi_password:"", deviceName:"", interval:0, password:""}
     else if(config.ssid) lib.connectWifiWithoutPassword(config.ssid, logger);
     logger.info( `Trying to connect WIFI (${config.ssid} / ${config.wifi_password})` );
   }
+  
+  // led 컨트롤 준비
+  let ledHigh = new Gpio(18, 'high');
+  let ledLow = new Gpio(18, 'low');
+  if(config.led && config.led=="HIGH") ledHigh.write(1);
+  else ledLow.write(0);
+  process.on('SIGINT', _ => {
+    ledHigh.unexport();
+    ledLow.unexport();
+  });
 
   // 백엔드에 ws 연결
   loop();
@@ -143,17 +153,13 @@ async function loop() {
         logger.debug("LED_LOW RECVED!");
         config.led = "LOW";
         fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
-        const led = new Gpio(18, 'out');
-        // ...
-        led.unexport();
+        ledHigh.write(0);
       }
       if(type==lib.const.TYPE_LED_HIGH) {
         logger.debug("LED_HIGH RECVED!");
         config.led = "HIGH";
         fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
-        const led = new Gpio(18, 'out');
-        // ...
-        led.unexport();
+        ledLow.write(0);
       }
       if(type==lib.const.TYPE_GREETING) {
         config = JSON.parse(body.toString());

@@ -53,8 +53,8 @@ server.ws("/sock", function(conn,req) {
   conn.on("message", function(msg) {
     conn.$buf = Buffer.concat([conn.$buf, msg]);
     let length, type;
-    if(conn.$buf.length>=4) length = conn.$buf.readUInt32BE(0);
-    if(conn.$buf.length>=5) type = conn.$buf.readUInt8(4);
+    if(conn.$buf.length>=4) length = conn.$buf.readUInt32BE(0); else return;
+    if(conn.$buf.length>=5) type = conn.$buf.readUInt8(4); else return;
     if(type==lib.const.TYPE_GREETING && conn.$buf.length>=length) {
       // 클라이언트 등록
       conn.config = JSON.parse(conn.$buf.subarray(5, length).toString());
@@ -63,12 +63,12 @@ server.ws("/sock", function(conn,req) {
       if(!fs.existsSync(`./storage/S${conn.config.deviceName}`)) fs.mkdirSync(`./storage/S${conn.config.deviceName}`);
       conn.$buf = conn.$buf.subarray(length);
     }
-    if(type==lib.const.TYPE_PING && conn.config) {
+    else if(type==lib.const.TYPE_PING && conn.config) {
       // 이 클라이언트의 최근 활동시각 업데이트
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
     }
-    if(type==lib.const.TYPE_IMAGE && conn.config) {
+    else if(type==lib.const.TYPE_IMAGE && conn.config) {
       // 이 클라이언트에서 수신된 이미지 저장
       conn.$saving = true;
       fs.writeFileSync(`./storage/S${conn.config.deviceName}/latest.jpg`, conn.$buf.subarray(5, length));
@@ -76,6 +76,9 @@ server.ws("/sock", function(conn,req) {
       conn.$saving = false;
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
+    }
+    else {
+      logger.error("recv wrong type", type, length);
     }
   });
   conn.on("close", function(why, desc) {

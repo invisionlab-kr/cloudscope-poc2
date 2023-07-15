@@ -75,10 +75,10 @@ server.ws("/sock", function(conn,req) {
       // 이 클라이언트에서 수신된 이미지 저장
       conn.$saving = true;
       fs.writeFileSync(`./storage/S${conn.config.deviceName}/latest.jpg`, conn.$buf.subarray(5, length));
-      logger.info(`saved image ${length-5} bytes`);
       conn.$saving = false;
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
+      logger.info(`saved image ${length-5} bytes, bufsize=${conn.$buf.length}`);
     }
     else {
       logger.error("recv wrong type", type, length, conn.$buf.length);

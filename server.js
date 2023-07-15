@@ -43,7 +43,7 @@ server.get("/logout", function(req, res, next) {
 server.get("/live", function(req, res, next) {
   if(!req.session || !req.session.device) { res.redirect("/"); return; }
   res.render("01_CloudScope_Live_Viewer", {
-    config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
+    config: devices.filter((dev) => (dev.config.deviceName==req.session.device))[0].config
   });
 });
 server.get("/latest", function(req, res, next) {
@@ -52,7 +52,7 @@ server.get("/latest", function(req, res, next) {
 });
 server.post("/set/led", function(req, res, next) {
   if(!req.session || !req.session.device) { res.status(500); return; }
-  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let d = devices.filter((dev) => (dev.config.deviceName==req.session.device))[0];
   let buf = Buffer.alloc(5);
   buf.writeUInt32BE(5, 0);
   buf.writeUInt8(req.body.status=="true"?lib.const.TYPE_LED_HIGH:lib.const.TYPE_LED_LOW, 4);
@@ -62,12 +62,12 @@ server.post("/set/led", function(req, res, next) {
 server.get("/download", function(req, res, next) {
   if(!req.session || !req.session.device) { res.redirect("/"); return; }
   res.render("01_CloudScope_Download", {
-    config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
+    config: devices.filter((dev) => (dev.config.deviceName==req.session.device))[0].config
   });
 });
 server.post("/set/interval", function(req, res, next) {
   if(!req.session || !req.session.device) { res.redirect("/"); return; }
-  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let d = devices.filter((dev) => (dev.config.deviceName==req.session.device))[0];
   d.config.interval = req.body.interval;
   let cbuf = Buffer.from(JSON.stringify(d.config));
   let rbuf = Buffer.alloc(5);
@@ -79,7 +79,7 @@ server.post("/set/interval", function(req, res, next) {
 });
 server.post("/set/saved", function(req, res, next) {
   if(!req.session || !req.session.device) { res.redirect("/"); return; }
-  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let d = devices.filter((dev) => (dev.config.deviceName==req.session.device))[0];
   let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   let count = 0;
   while( true ) {
@@ -92,7 +92,7 @@ server.post("/set/saved", function(req, res, next) {
 });
 server.post("/set/delete", function(req, res, next) {
   if(!req.session || !req.session.device) { res.redirect("/"); return; }
-  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let d = devices.filter((dev) => (dev.config.deviceName==req.session.device))[0];
   let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   while( true ) {
     let dirent = dir.readSync();
@@ -104,7 +104,7 @@ server.post("/set/delete", function(req, res, next) {
 });
 server.get("/set/zip", function(req, res, next) {
   if(!req.session || !req.session.device) { res.redirect("/"); return; }
-  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let d = devices.filter((dev) => (dev.config.deviceName==req.session.device))[0];
   let dir = fs.opendirSync(`./storage/S${d.config.deviceName}`);
   let zip = new admZip();
   while( true ) {

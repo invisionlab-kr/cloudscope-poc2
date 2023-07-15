@@ -50,7 +50,10 @@ server.get("/latest", function(req, res, next) {
   res.sendFile(`${__dirname}/storage/S${req.session.device}/latest.jpg`);
 });
 server.get("/download", function(req, res, next) {
-  res.render("01_CloudScope_Download");
+  if(!req.session.device) { res.redirect("/"); return; }
+  res.render("01_CloudScope_Download", {
+    config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
+  });
 });
 server.ws("/sock", function(conn,req) {
   logger.info("client connected.");

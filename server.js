@@ -71,6 +71,7 @@ server.ws("/sock", function(conn,req) {
       conn.$buf = conn.$buf.subarray(length);
     }
     else if(type==lib.const.TYPE_IMAGE && conn.config) {
+      logger.debug(`length=${length}, bufsize=${conn.$buf.length}`);
       // 이 클라이언트에서 수신된 이미지 저장
       conn.$saving = true;
       fs.writeFileSync(`./storage/S${conn.config.deviceName}/latest.jpg`, conn.$buf.subarray(5, length));

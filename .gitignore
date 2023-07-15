@@ -2,6 +2,7 @@
 wpa_supplicant.conf
 *test*
 stills/*.png
+stills/*.jpg
 storage/S*
 
 # Logs

@@ -61,8 +61,12 @@ server.post("/set/led", function(req, res, next) {
 });
 server.get("/download", function(req, res, next) {
   if(!req.session || !req.session.device) { res.redirect("/"); return; }
+  logger.debug("REQUESTED DEVICE NAME", req.session.device);
+  let dev = devices.filter((dev) => (dev.config.deviceName==req.session.device));
+  logger.debug("FILTERED DEVICE COUNT", dev.length, "/", devices.length);
+  if(dev.length!=1) { res.redirect("/"); return; }
   res.render("01_CloudScope_Download", {
-    config: devices.filter((dev) => (dev.config.deviceName==req.session.device))[0].config
+    config: dev[0].config
   });
 });
 server.post("/set/interval", function(req, res, next) {

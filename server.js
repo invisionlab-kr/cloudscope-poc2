@@ -63,7 +63,7 @@ server.post("/set/interval", function(req, res, next) {
   let cbuf = Buffer.from(JSON.stringify(d.config));
   let rbuf = Buffer.alloc(5);
   rbuf.writeUInt32BE(5+cbuf.length, 0);
-  rbuf.writeUInt8(TYPE_GREETING, 4);
+  rbuf.writeUInt8(lib.const.TYPE_GREETING, 4);
   d.send(rbuf);
   d.send(cbuf);
   res.send("OK");

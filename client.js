@@ -151,6 +151,7 @@ async function loop() {
       }
       if(type==lib.const.TYPE_GREETING) {
         config = JSON.parse(body.toString());
+        logger.debug("GREETING RECVED", config);
         fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
       }
       socket.$buf = socket.$buf.subarray(length);

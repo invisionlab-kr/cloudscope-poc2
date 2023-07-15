@@ -50,6 +50,14 @@ server.get("/latest", function(req, res, next) {
   if(!req.session.device) { res.status(500); return; }
   res.sendFile(`${__dirname}/storage/S${req.session.device}/latest.jpg`);
 });
+server.post("/set/led", function(req, res, next) {
+  if(!req.session.device) { res.status(500); return; }
+  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let buf = Buffer.alloc(5);
+  buf.writeUInt32BE(5, 0);
+  buf.writeUInt8(req.body.status?TYPE_LED_HIGH:TYPE_LED_LOW, 4);
+  d.send(buf);
+});
 server.get("/download", function(req, res, next) {
   if(!req.session.device) { res.redirect("/"); return; }
   res.render("01_CloudScope_Download", {

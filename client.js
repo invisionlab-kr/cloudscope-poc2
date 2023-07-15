@@ -140,11 +140,13 @@ async function loop() {
       let type = socket.$buf.readUInt8(4);
       let body = socket.$buf.subarray(5, length);
       if(type==lib.const.TYPE_LED_LOW) {
+        logger.debug("LED_LOW RECVED!");
         const led = new Gpio(18, 'out');
         // ...
         led.unexport();
       }
       if(type==lib.const.TYPE_LED_HIGH) {
+        logger.debug("LED_HIGH RECVED!");
         const led = new Gpio(18, 'out');
         // ...
         led.unexport();

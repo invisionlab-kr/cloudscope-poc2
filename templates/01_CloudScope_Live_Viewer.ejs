@@ -156,6 +156,21 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <script src="dist/js/adminlte.min.js"></script>
   <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
 
+  <script>
+  // led switch
+  $("#customSwitch1").on("change", function() {
+    $.ajax({
+      method: "post",
+      url: "/set/led",
+      data: {
+        status: $("#customSwitch1").prop("checked")
+      },
+      success: function() {
+        
+      }
+    })
+  });
+  </script>
 </body>
 
 </html>

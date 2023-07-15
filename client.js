@@ -186,7 +186,8 @@ async function loop() {
         socket.send(header);
         socket.send(img);
         processing = false;
-        logger.info("sent image");
+        logger.info(`sent image ${filename}, size=${img.length}`);
+      }
     });
   });
 }

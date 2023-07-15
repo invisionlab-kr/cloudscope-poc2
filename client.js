@@ -149,6 +149,10 @@ async function loop() {
         // ...
         led.unexport();
       }
+      if(type==lib.const.TYPE_GREETING) {
+        config = JSON.parse(body.toString());
+        fs.writeFileSync("./config.json", Buffer.from(JSON.stringify(config)));
+      }
       socket.$buf = socket.$buf.subarray(length);
     }
   });

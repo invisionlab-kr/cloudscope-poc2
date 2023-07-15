@@ -6,6 +6,7 @@ const enableWs = require('express-ws');
 const fs = require("fs");
 const lib = require("./libs/server.js");
 const session = require("express-session");
+const zip = require("adm-zip");
 const devices = [];
 
 let server = express();
@@ -55,11 +56,49 @@ server.get("/download", function(req, res, next) {
     config: devices.filter((d) => (d.config.deviceName==req.session.device))[0].config
   });
 });
+server.post("/set/interval", function(req, res, next) {
+  if(!req.session.device) { res.redirect("/"); return; }
+  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  d.config.interval = req.body.interval;
+  let cbuf = Buffer.from(JSON.stringify(d.config));
+  let rbuf = Buffer.alloc(5);
+  rbuf.writeUInt32BE(5+cbuf.length, 0);
+  rbuf.writeUInt8(TYPE_GREETING, 4);
+  d.send(rbuf);
+  d.send(cbuf);
+  res.send("OK");
+});
+server.post("/set/saved", function(req, res, next) {
+  if(!req.session.device) { res.redirect("/"); return; }
+  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let dir = fs.opendirSync(`./storage/S${d.deviceName}`);
+  let count = 0;
+  while( true ) {
+    let dirent = dir.readSync();
+    if(dirent==null) break;
+    if(dirent.name.startsWith("SAVED")) count += 1;
+  }
+  dir.close();
+  res.send(count);
+});
+server.post("/set/delete", function(req, res, next) {
+  if(!req.session.device) { res.redirect("/"); return; }
+  let d = devices.filter((d) => (d.config.deviceName==req.session.device))[0];
+  let dir = fs.opendirSync(`./storage/S${d.deviceName}`);
+  while( true ) {
+    let dirent = dir.readSync();
+    if(dirent==null) break;
+    fs.unlinkSync(`./storage/S${d.deviceName}/${dirent.name}`);
+  }
+  dir.close();
+  res.send("OK");
+});
 server.ws("/sock", function(conn,req) {
-  logger.info("client connected.");
+  logger.info(`client connected. (current total ${devices.length})`);
   conn.$buf = Buffer.alloc(0);
   conn.$saving = false;
   conn.$active = (new Date()).getTime();
+  conn.$last = (new Date()).getTime();
   conn.on("message", function(msg) {
     conn.$buf = Buffer.concat([conn.$buf, msg]);
     let length, type;
@@ -68,6 +107,7 @@ server.ws("/sock", function(conn,req) {
     if(type==lib.const.TYPE_GREETING && conn.$buf.length>=length) {
       // 클라이언트 등록
       conn.config = JSON.parse(conn.$buf.subarray(5, length).toString());
+      if(!conn.config.interval) conn.config.interval = 0;
       devices.push(conn);
       // 이미지 저장할 디렉토리 준비
       if(!fs.existsSync(`./storage/S${conn.config.deviceName}`)) fs.mkdirSync(`./storage/S${conn.config.deviceName}`);
@@ -85,13 +125,23 @@ server.ws("/sock", function(conn,req) {
       conn.$saving = false;
       conn.$active = (new Date()).getTime();
       conn.$buf = conn.$buf.subarray(length);
-      logger.info(`saved image ${length-5} bytes, bufsize=${conn.$buf.length} from ${conn.config.deviceName} (passwd ${conn.config.password})`);
+      if(conn.config.interval && (new Date()).getTime()<conn.$last+(conn.config.interval*1000*60)) {
+        let now = new Date();
+        let name = "SAVED "+conn.config.deviceName+" ("+now.getFullYear()+"-"+("0"+(parseInt(now.getMonth())+1)).slice(-2)+"-"+("0"+now.getDate()).slice(-2)+" "+("0"+now.getHours()).slice(-2)+":"+("0"+now.getMinutes()).slice(-2)+").jpg";
+        fs.cpSync(
+          `./storage/S${conn.config.deviceName}/latest.jpg`,
+          `./storage/S${conn.config.deviceName}/${name}`,
+          {
+            force: true
+          }
+        )
+      }
     }
   });
   conn.on("close", function(why, desc) {
     let idx = devices.indexOf(conn);
     if(idx!=-1) devices.splice(idx, 1);
-    logger.info(`client disconnected. (${why}: ${desc})`);
+    logger.info(`client disconnected. (current total ${devices.length})`);
   })
 });
 

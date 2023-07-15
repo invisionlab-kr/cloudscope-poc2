@@ -31,7 +31,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <a class="nav-link" data-widget="pushmenu" href="#" role="button"><i class="fas fa-bars"></i></a>
         </li>
         <li class="nav-item d-none d-sm-inline-block">
-          <a href="invisionlab.kr" class="nav-link">Cloud AI Microscope</a>
+          <a href="/" class="nav-link">Cloud AI Microscope</a>
         </li>
       </ul>
     </nav>
@@ -40,8 +40,8 @@ scratch. This page gets rid of all links and provides the needed markup only.
     <!-- Main Sidebar Container -->
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <!-- Brand Logo -->
-      <a href="invisionlab.kr" class="brand-link">
-        <img src="logo2.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
+      <a href="https://invisionlab.kr" class="brand-link" target="_blank">
+        <img src="/dist/img/logo2.png" alt="AdminLTE Logo" class="brand-image img-circle elevation-3"
           style="opacity: .8">
         <span class="brand-text font-weight-light">INVISIONLAB</span>
       </a>
@@ -51,7 +51,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <!-- Sidebar user panel (optional) -->
         <div class="user-panel mt-3 pb-3 mb-3 d-flex">
           <div class="image">
-            <img src="microscope.jpg" class="img-circle elevation-2" alt="User Image">
+            <img src="/dist/img/microscope.jpg" class="img-circle elevation-2" alt="User Image">
           </div>
           <div class="info">
             <a href="#" class="d-block">INVISION CLOUD SCOPE</a>
@@ -62,7 +62,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
             <li class="nav-item">
-              <a href="#" class="nav-link ">
+              <a href="/live" class="nav-link ">
                 <i class="nav-icon fas fa-tachometer-alt"></i>
                 <p>
                   Live Viewer
@@ -106,23 +106,23 @@ scratch. This page gets rid of all links and provides the needed markup only.
                   <div class="form-group">
                     <label for="exampleInputEmail1">Image Save Period</label>
                     <div class="input-group mb-3">
-                      <input type="text" class="form-control" value="5">
+                      <input type="number" class="form-control" value="<%=config.interval%>" id="interval" min="0" step="1">
                       <div class="input-group-append">
-                        <span class="input-group-text">Minutes / Frame</span>
+                        <span class="input-group-text">Minutes / Frame (0 if you want not to save any)</span>
                       </div>
                     </div>
                   </div>
-                  <button type="button" class="btn btn-block btn-primary">Save Period</button>
+                  <button type="button" class="btn btn-block btn-primary" id="btnSetInterval">Save Period</button>
                   <div class="form-group mt-3">
                     <label for="exampleInputEmail1">Images on Memory</label>
                     <div class="input-group mb-3">
-                      <input type="text" class="form-control" value="5" readonly>
+                      <input type="text" id="saved" class="form-control" value="Calculating..." readonly>
                       <div class="input-group-append">
                         <span class="input-group-text">Frames Saved</span>
                       </div>
                     </div>
                   </div>
-                  <button type="button" class="btn btn-block btn-danger">Remove ALL</button>
+                  <button type="button" class="btn btn-block btn-danger" id="btnDeleteAll">Remove ALL</button>
                 </div>
               </form>
             </div>
@@ -130,7 +130,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
           <div class="row mb-2">
             <div class="col-sm-9">
               <div class="btn-group btn-block">
-                <button type="button" class="btn btn-primary">Download ALL</button>
+                <button type="button" class="btn btn-primary" id="btnDownloadAll">Download ALL</button>
               </div>
             </div>
           </div>
@@ -157,7 +157,7 @@ scratch. This page gets rid of all links and provides the needed markup only.
         AI Spark to All Industry.
       </div>
       <!-- Default to the left -->
-      <strong>Copyright &copy; 2023 <a href="invisionlab.kr">InVisionLab</a>.</strong> All rights reserved.
+      <strong>Copyright &copy; 2023 <a href="https://invisionlab.kr" target="_blank">InVisionLab</a>.</strong> All rights reserved.
     </footer>
   </div>
   <!-- ./wrapper -->
@@ -172,6 +172,53 @@ scratch. This page gets rid of all links and provides the needed markup only.
   <script src="dist/js/adminlte.min.js"></script>
   <script src="https://unpkg.com/ionicons@5.1.2/dist/ionicons.js"></script>
 
+
+  <script>
+  // 이미지 저장 주기 설정
+  $("#btnSetInterval").on("click", function() {
+    let interval = $("#interval").val();
+    $.ajax({
+      method: "post",
+      url: "/set/interval",
+      data: {
+        interval
+      },
+      success: function() {
+        $("#btnSetInterval").html("SAVED!");
+        setTimeout(() => {
+          $("#btnSetInterval").html("Save Period");
+        }, 2000);
+      }
+    })
+  })
+  // 저장된 이미지 수 갱신
+  setInterval(() => {
+    $("#saved").val("Calculating...");
+    $.ajax({
+      method: "post",
+      url: "/set/saved",
+      success: function(r) {
+        $("#saved").val(r);
+      }
+    })
+  }, 10*1000);
+  // 저장된 이미지 삭제
+  $("#btnDeleteAll").on("click", function() {
+    if(confirm("Are you sure to delete saved images? It is irreversible!")) {
+      $.ajax({
+        method: "post",
+        url: "/set/delete",
+        success: function() {
+          $("#saved").val(0);
+          $("#btnDeleteAll").html("DELETED!");
+          setTimeout(() => {
+            $("#btnDeleteAll").html("Remove ALL");
+          }, 2000);
+        }
+      });
+    }
+  })
+  </script>
 </body>
 
 </html>

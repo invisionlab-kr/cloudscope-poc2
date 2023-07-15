@@ -79,7 +79,7 @@ server.post("/set/saved", function(req, res, next) {
     if(dirent.name.startsWith("SAVED")) count += 1;
   }
   dir.close();
-  res.send(count);
+  res.send(count.toString());
 });
 server.post("/set/delete", function(req, res, next) {
   if(!req.session.device) { res.redirect("/"); return; }
